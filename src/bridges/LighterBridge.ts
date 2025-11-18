@@ -123,17 +123,26 @@ export class LighterBridge extends Bridge {
     }
   }
 
-  private async createLighterIntentAddress(): Promise<string | null> {
+  public async createLighterIntentAddress(): Promise<string | null> {
     try {
-      const response = await axios.post(`${this.apiUrl}/createIntentAddress`, {
-        chain_id: this.config.chainId,
-        from_addr: this.signer.address,
-        amount: 5_000_000,
-        is_external_deposit: false,
-      });
+      const params = new URLSearchParams();
+      params.append("chain_id", this.config.chainId);
+      params.append("from_addr", this.signer.address);
+      params.append("amount", "5000000");
+      params.append("is_external_deposit", "false");
+
+      const response = await axios.post(
+        `${this.apiUrl}/createIntentAddress`,
+        params.toString(),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+          },
+        }
+      );
 
       return response.data.intent_address;
-    } catch (error) {
+    } catch (error: any) {
       console.error("Create lighter intent address failed:", error);
 
       return null;
