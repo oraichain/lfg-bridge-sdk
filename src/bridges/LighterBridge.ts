@@ -1,5 +1,6 @@
 import { ethers } from "ethers";
 import axios from "axios";
+import { SignerClient } from "@oraichain/lighter-ts-sdk";
 
 import { LIGHTER_CONFIG } from "../configs";
 import {
@@ -7,11 +8,15 @@ import {
   LighterAccount,
   LighterDepositParams,
   LighterDepositResult,
+  LighterWithdrawParams,
+  LighterWithdrawResult,
 } from "../types";
 import { Bridge } from ".";
 
 export class LighterBridge extends Bridge {
   private apiUrl: string;
+  private signerClient: SignerClient;
+  private isInitSignerClient: boolean = false;
 
   constructor(rpcUrl: string, privateKey: string) {
     // init parent class
@@ -33,6 +38,14 @@ export class LighterBridge extends Bridge {
       LIGHTER_CONFIG.usdcAbi,
       this.provider
     );
+
+    // init signer client
+    this.signerClient = new SignerClient({
+      url: this.apiUrl,
+      privateKey: privateKey,
+      accountIndex: 0,
+      apiKeyIndex: 0,
+    });
   }
 
   public async deposit(
@@ -104,6 +117,34 @@ export class LighterBridge extends Bridge {
     }
   }
 
+  public async withdraw(
+    params: LighterWithdrawParams
+  ): Promise<LighterWithdrawResult> {
+    try {
+      // make sure signer client is initialized
+      await this.makeSureSignerClientInitialized();
+
+      // Create withdraw transaction
+      const [tx, txHash, error] = await this.signerClient.withdraw({
+        usdcAmount: parseFloat(params.amount.toString()),
+        nonce: params.nonce || -1,
+      });
+      if (error) {
+        throw new Error(`Create withdraw transaction failed: ${error}`);
+      }
+
+      return {
+        txHash: txHash,
+        amount: params.amount.toString(),
+        txInfo: tx,
+      };
+    } catch (error) {
+      console.error("Withdraw failed:", error);
+
+      throw error;
+    }
+  }
+
   private async getLighterAccounts(
     address: string
   ): Promise<LighterAccount | null> {
@@ -145,5 +186,15 @@ export class LighterBridge extends Bridge {
 
       return null;
     }
+  }
+
+  async makeSureSignerClientInitialized(): Promise<void> {
+    if (this.isInitSignerClient) {
+      return;
+    }
+
+    await this.signerClient.initialize();
+    await this.signerClient.ensureWasmClient();
+    this.isInitSignerClient = true;
   }
 }

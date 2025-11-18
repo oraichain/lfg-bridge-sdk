@@ -17,3 +17,12 @@ export interface DepositResult {
   blockHeight?: number;
   gasUsed?: string;
 }
+
+export interface WithdrawParams {
+  amount: number;
+}
+
+export interface WithdrawResult {
+  txHash: string;
+  amount: string;
+}

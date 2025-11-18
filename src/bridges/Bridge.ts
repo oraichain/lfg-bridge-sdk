@@ -1,6 +1,12 @@
 import { ethers } from "ethers";
 
-import { BridgeConfig, DepositParams, DepositResult } from "../types/bridge";
+import {
+  BridgeConfig,
+  DepositParams,
+  DepositResult,
+  WithdrawParams,
+  WithdrawResult,
+} from "../types";
 
 export abstract class Bridge {
   // config for bridge, now only support bridge from Arbitrum
@@ -20,5 +26,9 @@ export abstract class Bridge {
     this.signer = new ethers.Wallet(privateKey, this.provider);
   }
 
+  // deposit USDC from Arbitrum to Dex chain
   public abstract deposit(params: DepositParams): Promise<DepositResult>;
+
+  // withdraw USDC from Dex chain to Arbitrum
+  public abstract withdraw(params: WithdrawParams): Promise<WithdrawResult>;
 }

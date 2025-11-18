@@ -1,4 +1,10 @@
-import { BridgeConfig, DepositParams, DepositResult } from "./bridge";
+import {
+  BridgeConfig,
+  DepositParams,
+  DepositResult,
+  WithdrawParams,
+  WithdrawResult,
+} from "./bridge";
 
 export interface LighterConfig extends BridgeConfig {}
 
@@ -7,6 +13,14 @@ export interface LighterDepositParams extends DepositParams {
 }
 
 export interface LighterDepositResult extends DepositResult {}
+
+export interface LighterWithdrawParams extends WithdrawParams {
+  nonce?: number;
+}
+
+export interface LighterWithdrawResult extends WithdrawResult {
+  txInfo: string;
+}
 
 export interface LighterSubAccount {
   code: number;
