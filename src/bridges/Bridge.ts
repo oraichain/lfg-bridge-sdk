@@ -2,6 +2,8 @@ import { ethers } from "ethers";
 
 import {
   BridgeConfig,
+  CheckingDepositProgressParams,
+  CheckingDepositProgressResult,
   DepositParams,
   DepositResult,
   WithdrawParams,
@@ -28,6 +30,11 @@ export abstract class Bridge {
 
   // deposit USDC from Arbitrum to Dex chain
   public abstract deposit(params: DepositParams): Promise<DepositResult>;
+
+  // checking deposit progress
+  public abstract checkingDepositProgress(
+    params: CheckingDepositProgressParams
+  ): Promise<CheckingDepositProgressResult>;
 
   // withdraw USDC from Dex chain to Arbitrum
   public abstract withdraw(params: WithdrawParams): Promise<WithdrawResult>;

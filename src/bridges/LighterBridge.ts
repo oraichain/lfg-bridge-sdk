@@ -6,6 +6,9 @@ import { LIGHTER_CONFIG } from "../configs";
 import {
   BridgeConfig,
   LighterAccount,
+  LighterBridgeInfo,
+  LighterCheckingDepositProgressParams,
+  LighterCheckingDepositProgressResult,
   LighterDepositParams,
   LighterDepositResult,
   LighterWithdrawParams,
@@ -117,6 +120,33 @@ export class LighterBridge extends Bridge {
     }
   }
 
+  public async checkingDepositProgress(
+    params: LighterCheckingDepositProgressParams
+  ): Promise<LighterCheckingDepositProgressResult> {
+    try {
+      // polling to check deposit progress
+      while (true) {
+        const bridgeInfos = await this.getBridgeInfos(params.address);
+        if (!bridgeInfos) {
+          throw new Error("Get bridge infos failed");
+        }
+
+        const bridgeInfo = bridgeInfos[bridgeInfos.length - 1];
+        if (bridgeInfo.status === "completed") {
+          return {
+            status: "completed",
+          };
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, 5_000));
+      }
+    } catch (error) {
+      console.error("Checking deposit progress failed:", error);
+
+      throw error;
+    }
+  }
+
   public async withdraw(
     params: LighterWithdrawParams
   ): Promise<LighterWithdrawResult> {
@@ -162,7 +192,7 @@ export class LighterBridge extends Bridge {
     }
   }
 
-  public async createLighterIntentAddress(): Promise<string | null> {
+  private async createLighterIntentAddress(): Promise<string | null> {
     try {
       const params = new URLSearchParams();
       params.append("chain_id", this.config.chainId);
@@ -184,6 +214,22 @@ export class LighterBridge extends Bridge {
     } catch (error: any) {
       console.error("Create lighter intent address failed:", error);
 
+      return null;
+    }
+  }
+
+  private async getBridgeInfos(
+    address: string
+  ): Promise<LighterBridgeInfo[] | null> {
+    try {
+      const response = await axios.get(`${this.apiUrl}/bridges`, {
+        params: {
+          l1_address: address,
+        },
+      });
+
+      return response.data.bridges;
+    } catch (error) {
       return null;
     }
   }

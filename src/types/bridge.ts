@@ -26,3 +26,11 @@ export interface WithdrawResult {
   txHash: string;
   amount: string;
 }
+
+export interface CheckingDepositProgressParams {
+  address: string;
+}
+
+export interface CheckingDepositProgressResult {
+  status: string;
+}

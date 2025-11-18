@@ -1,5 +1,7 @@
 import {
   BridgeConfig,
+  CheckingDepositProgressParams,
+  CheckingDepositProgressResult,
   DepositParams,
   DepositResult,
   WithdrawParams,
@@ -22,6 +24,12 @@ export interface LighterWithdrawResult extends WithdrawResult {
   txInfo: string;
 }
 
+export interface LighterCheckingDepositProgressParams
+  extends CheckingDepositProgressParams {}
+
+export interface LighterCheckingDepositProgressResult
+  extends CheckingDepositProgressResult {}
+
 export interface LighterSubAccount {
   code: number;
   message: string;
@@ -42,4 +50,22 @@ export interface LighterAccount {
   message: string;
   l1_address: string;
   sub_accounts: LighterSubAccount[];
+}
+
+export interface LighterBridgeInfo {
+  id: number;
+  version: number;
+  source: string;
+  source_chain_id: string;
+  fast_bridge_tx_hash: string;
+  batch_claim_tx_hash: string;
+  cctp_burn_tx_hash: string;
+  amount: string;
+  intent_address: string;
+  status: string;
+  step: string;
+  description: string;
+  created_at: number;
+  updated_at: number;
+  is_external_deposit: boolean;
 }
