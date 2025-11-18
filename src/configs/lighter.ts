@@ -4,6 +4,7 @@ export const LIGHTER_CONFIG = {
   usdcAbi: [
     "function transfer(address to, uint256 amount) external returns (bool)",
     "function decimals() external view returns (uint8)",
+    "function balanceOf(address account) external view returns (uint256)",
   ],
   apiUrl: "https://mainnet.zklighter.elliot.ai/api/v1",
 };

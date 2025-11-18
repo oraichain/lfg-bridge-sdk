@@ -117,8 +117,6 @@ export class LighterBridge extends Bridge {
 
       return response.data;
     } catch (error) {
-      console.error("Get lighter accounts failed:", error);
-
       return null;
     }
   }
