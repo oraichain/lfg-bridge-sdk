@@ -6,5 +6,5 @@ export const LIGHTER_CONFIG = {
     "function decimals() external view returns (uint8)",
     "function balanceOf(address account) external view returns (uint256)",
   ],
-  apiUrl: "https://mainnet.zklighter.elliot.ai/api/v1",
+  apiUrl: "https://mainnet.zklighter.elliot.ai",
 };

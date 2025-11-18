@@ -4,6 +4,8 @@ import {
   BridgeConfig,
   CheckingDepositProgressParams,
   CheckingDepositProgressResult,
+  CheckingWithdrawProgressParams,
+  CheckingWithdrawProgressResult,
   DepositParams,
   DepositResult,
   WithdrawParams,
@@ -38,4 +40,9 @@ export abstract class Bridge {
 
   // withdraw USDC from Dex chain to Arbitrum
   public abstract withdraw(params: WithdrawParams): Promise<WithdrawResult>;
+
+  // checking withdraw progress
+  public abstract checkingWithdrawProgress(
+    params: CheckingWithdrawProgressParams
+  ): Promise<CheckingWithdrawProgressResult>;
 }

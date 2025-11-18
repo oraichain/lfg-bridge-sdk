@@ -2,6 +2,8 @@ import {
   BridgeConfig,
   CheckingDepositProgressParams,
   CheckingDepositProgressResult,
+  CheckingWithdrawProgressParams,
+  CheckingWithdrawProgressResult,
   DepositParams,
   DepositResult,
   WithdrawParams,
@@ -29,6 +31,12 @@ export interface LighterCheckingDepositProgressParams
 
 export interface LighterCheckingDepositProgressResult
   extends CheckingDepositProgressResult {}
+
+export interface LighterCheckingWithdrawProgressParams
+  extends CheckingWithdrawProgressParams {}
+
+export interface LighterCheckingWithdrawProgressResult
+  extends CheckingWithdrawProgressResult {}
 
 export interface LighterSubAccount {
   code: number;

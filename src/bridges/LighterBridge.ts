@@ -9,6 +9,8 @@ import {
   LighterBridgeInfo,
   LighterCheckingDepositProgressParams,
   LighterCheckingDepositProgressResult,
+  LighterCheckingWithdrawProgressParams,
+  LighterCheckingWithdrawProgressResult,
   LighterDepositParams,
   LighterDepositResult,
   LighterWithdrawParams,
@@ -41,14 +43,6 @@ export class LighterBridge extends Bridge {
       LIGHTER_CONFIG.usdcAbi,
       this.provider
     );
-
-    // init signer client
-    this.signerClient = new SignerClient({
-      url: this.apiUrl,
-      privateKey: privateKey,
-      accountIndex: 0,
-      apiKeyIndex: 0,
-    });
   }
 
   public async deposit(
@@ -147,12 +141,43 @@ export class LighterBridge extends Bridge {
     }
   }
 
+  public async initializeSignerClient(
+    apiPrivateKey: string,
+    accountIndex: number,
+    apiKeyIndex: number
+  ): Promise<void> {
+    try {
+      if (this.isInitSignerClient) {
+        return;
+      }
+
+      // init signer client
+      this.signerClient = new SignerClient({
+        url: this.apiUrl,
+        privateKey: apiPrivateKey,
+        accountIndex,
+        apiKeyIndex,
+      });
+
+      await this.signerClient.initialize();
+      await this.signerClient.ensureWasmClient();
+
+      this.isInitSignerClient = true;
+    } catch (error) {
+      console.error("Init signer client failed:", error);
+
+      throw error;
+    }
+  }
+
   public async withdraw(
     params: LighterWithdrawParams
   ): Promise<LighterWithdrawResult> {
     try {
       // make sure signer client is initialized
-      await this.makeSureSignerClientInitialized();
+      if (!this.isInitSignerClient) {
+        throw new Error("Signer client is not initialized");
+      }
 
       // Create withdraw transaction
       const [tx, txHash, error] = await this.signerClient.withdraw({
@@ -175,11 +200,35 @@ export class LighterBridge extends Bridge {
     }
   }
 
+  public async checkingWithdrawProgress(
+    params: LighterCheckingWithdrawProgressParams
+  ): Promise<LighterCheckingWithdrawProgressResult> {
+    try {
+      const { status, nonce, hash, message } =
+        await this.signerClient.waitForTransaction(
+          params.txHash,
+          160_000,
+          5_000
+        );
+
+      return {
+        status,
+        nonce,
+        hash,
+        message,
+      };
+    } catch (error) {
+      console.error("Checking withdraw progress failed:", error);
+
+      throw error;
+    }
+  }
+
   private async getLighterAccounts(
     address: string
   ): Promise<LighterAccount | null> {
     try {
-      const response = await axios.get(`${this.apiUrl}/account`, {
+      const response = await axios.get(`${this.apiUrl}/api/v1/account`, {
         params: {
           by: "l1_address",
           value: address,
@@ -201,7 +250,7 @@ export class LighterBridge extends Bridge {
       params.append("is_external_deposit", "false");
 
       const response = await axios.post(
-        `${this.apiUrl}/createIntentAddress`,
+        `${this.apiUrl}/api/v1/createIntentAddress`,
         params.toString(),
         {
           headers: {
@@ -222,7 +271,7 @@ export class LighterBridge extends Bridge {
     address: string
   ): Promise<LighterBridgeInfo[] | null> {
     try {
-      const response = await axios.get(`${this.apiUrl}/bridges`, {
+      const response = await axios.get(`${this.apiUrl}/api/v1/bridges`, {
         params: {
           l1_address: address,
         },
@@ -232,15 +281,5 @@ export class LighterBridge extends Bridge {
     } catch (error) {
       return null;
     }
-  }
-
-  async makeSureSignerClientInitialized(): Promise<void> {
-    if (this.isInitSignerClient) {
-      return;
-    }
-
-    await this.signerClient.initialize();
-    await this.signerClient.ensureWasmClient();
-    this.isInitSignerClient = true;
   }
 }

@@ -34,3 +34,14 @@ export interface CheckingDepositProgressParams {
 export interface CheckingDepositProgressResult {
   status: string;
 }
+
+export interface CheckingWithdrawProgressParams {
+  txHash: string;
+}
+
+export interface CheckingWithdrawProgressResult {
+  status: number | "pending" | "confirmed" | "failed";
+  hash: string;
+  nonce: number;
+  message: string;
+}
