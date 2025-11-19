@@ -1,5 +1,5 @@
 {
-  "name": "lfg-bridge-sdk",
+  "name": "@oraichain/lfg-bridge-sdk",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:oraichain/lfg-bridge-sdk.git",
