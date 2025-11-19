@@ -164,13 +164,16 @@ export class LighterBridge extends Bridge {
       }
 
       const l1Account = await this.getLighterAccounts(this.signer.address);
-      const accountIndex = l1Account?.accounts[0].account_index;
+      const accountIndex = l1Account?.accounts[0]?.account_index;
+      if (!accountIndex) {
+        throw new Error("Account index not found");
+      }
 
       let finalApiPrivateKey = apiPrivateKey;
       let finalApiKeyIndex = apiKeyIndex;
 
       if (!finalApiPrivateKey || !finalApiKeyIndex) {
-        // init signer client
+        // init signer client temporarily to generate api key
         this.signerClient = new SignerClient({
           url: this.apiUrl,
           privateKey: " ",
@@ -183,9 +186,15 @@ export class LighterBridge extends Bridge {
           await this.signerClient.generateAPIKey();
 
         finalApiPrivateKey = privateKey;
+        // for simplicity, use the last api key index
         finalApiKeyIndex =
           apiKeys?.api_keys[apiKeys.api_keys.length - 1].api_key_index;
+        // this means this user is new and has no custom api key yet -> by default use finalApiKeyIndex = 2
+        if (!finalApiKeyIndex || finalApiKeyIndex <= 1) {
+          finalApiKeyIndex = 2;
+        }
 
+        // init 2nd time with newly gen api priv key to initialize and change api key
         this.signerClient = new SignerClient({
           url: this.apiUrl,
           privateKey: privateKey,
@@ -201,7 +210,12 @@ export class LighterBridge extends Bridge {
           newPubkey: publicKey,
           newApiKeyIndex: finalApiKeyIndex,
         });
-        console.log("changeApiKeyResult: ", changeApiKeyResult);
+        if (changeApiKeyResult[2] !== null) {
+          console.error("Change api key failed: ", changeApiKeyResult);
+          throw new Error(
+            `Change api key failed: ${changeApiKeyResult[2]}. Error code: ${changeApiKeyResult[0].code}`
+          );
+        }
       }
 
       // init signer client
