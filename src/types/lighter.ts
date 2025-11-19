@@ -50,14 +50,30 @@ export interface LighterSubAccount {
   pending_order_count: number;
   available_balance: string;
   status: number;
+  account_index: number;
   collateral: string;
+  cross_asset_value: string;
+  description: string;
+  name: string;
 }
 
 export interface LighterAccount {
   code: number;
   message: string;
   l1_address: string;
-  sub_accounts: LighterSubAccount[];
+  accounts: LighterSubAccount[];
+}
+
+export interface LighterApiKeys {
+  code: number;
+  api_keys: LighterApiKeyInfo[];
+}
+
+export interface LighterApiKeyInfo {
+  account_index: number;
+  api_key_index: number;
+  nonce: number;
+  public_key: string;
 }
 
 export interface LighterBridgeInfo {
