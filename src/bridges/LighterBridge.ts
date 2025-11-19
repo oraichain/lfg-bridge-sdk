@@ -1,11 +1,12 @@
 import { ethers } from "ethers";
 import axios from "axios";
-import { SignerClient } from "@oraichain/lighter-ts-sdk";
+import { AccountApi, ApiClient, SignerClient } from "@oraichain/lighter-ts-sdk";
 
 import { LIGHTER_CONFIG } from "../configs";
 import {
   BridgeConfig,
   LighterAccount,
+  LighterApiKeys,
   LighterBridgeInfo,
   LighterCheckingDepositProgressParams,
   LighterCheckingDepositProgressResult,
@@ -22,11 +23,16 @@ export class LighterBridge extends Bridge {
   private apiUrl: string;
   private signerClient: SignerClient;
   private isInitSignerClient: boolean = false;
+  private privateKey: string;
+
+  get signerAddress(): string {
+    return this.signer.address;
+  }
 
   constructor(rpcUrl: string, privateKey: string) {
     // init parent class
     super(rpcUrl, privateKey);
-
+    this.privateKey = privateKey;
     // init api url
     this.apiUrl = LIGHTER_CONFIG.apiUrl;
 
@@ -56,7 +62,7 @@ export class LighterBridge extends Bridge {
 
       // check if account is exist
       const account = await this.getLighterAccounts(this.signer.address);
-      if (!account) {
+      if (!account || !params.intentAddress) {
         // create lighter intent address
         const intentAddress = await this.createLighterIntentAddress();
         if (!intentAddress) {
@@ -64,6 +70,10 @@ export class LighterBridge extends Bridge {
         }
 
         params.intentAddress = intentAddress;
+      }
+
+      if (!params.intentAddress) {
+        throw new Error("Intent address is not set");
       }
 
       // connect contracts to wallet
@@ -141,22 +151,79 @@ export class LighterBridge extends Bridge {
     }
   }
 
-  public async initializeSignerClient(
-    apiPrivateKey: string,
-    accountIndex: number,
-    apiKeyIndex: number
-  ): Promise<void> {
+  public async initializeSignerClient({
+    apiPrivateKey,
+    apiKeyIndex,
+  }: {
+    apiPrivateKey?: string;
+    apiKeyIndex?: number;
+  }): Promise<void> {
     try {
       if (this.isInitSignerClient) {
         return;
       }
 
+      const l1Account = await this.getLighterAccounts(this.signer.address);
+      const accountIndex = l1Account?.accounts[0]?.account_index;
+      if (!accountIndex) {
+        throw new Error("Account index not found");
+      }
+
+      let finalApiPrivateKey = apiPrivateKey;
+      let finalApiKeyIndex = apiKeyIndex;
+
+      if (!finalApiPrivateKey || !finalApiKeyIndex) {
+        // init signer client temporarily to generate api key
+        this.signerClient = new SignerClient({
+          url: this.apiUrl,
+          privateKey: " ",
+          accountIndex,
+          apiKeyIndex: 0,
+        });
+
+        let apiKeys = await this.getApiKeysInfos(accountIndex);
+        const { privateKey, publicKey } =
+          await this.signerClient.generateAPIKey();
+
+        finalApiPrivateKey = privateKey;
+        // for simplicity, use the last api key index
+        finalApiKeyIndex =
+          apiKeys?.api_keys[apiKeys?.api_keys.length - 1]?.api_key_index;
+        // this means this user is new and has no custom api key yet -> by default use finalApiKeyIndex = 2
+        if (!finalApiKeyIndex || finalApiKeyIndex <= 1) {
+          finalApiKeyIndex = 2;
+        }
+
+        // init 2nd time with newly gen api priv key to initialize and change api key
+        this.signerClient = new SignerClient({
+          url: this.apiUrl,
+          privateKey: privateKey,
+          accountIndex,
+          apiKeyIndex: 0,
+        });
+
+        await this.signerClient.initialize();
+        await this.signerClient.ensureWasmClient();
+
+        const changeApiKeyResult = await this.signerClient.changeApiKey({
+          ethPrivateKey: this.privateKey,
+          newPubkey: publicKey,
+          newApiKeyIndex: finalApiKeyIndex,
+        });
+        if (changeApiKeyResult[2]) {
+          console.error("Change api key failed: ", changeApiKeyResult);
+          throw new Error(
+            `Change api key failed: ${changeApiKeyResult[2]}. Error code: ${changeApiKeyResult[0].code}`
+          );
+        }
+      }
+
       // init signer client
       this.signerClient = new SignerClient({
         url: this.apiUrl,
-        privateKey: apiPrivateKey,
+        privateKey: finalApiPrivateKey,
         accountIndex,
-        apiKeyIndex,
+        apiKeyIndex: finalApiKeyIndex,
       });
 
       await this.signerClient.initialize();
@@ -237,6 +304,24 @@ export class LighterBridge extends Bridge {
 
       return response.data;
     } catch (error) {
+      console.error("Get lighter accounts failed:", error);
+      return null;
+    }
+  }
+
+  private async getApiKeysInfos(
+    accountIndex: number
+  ): Promise<LighterApiKeys | null> {
+    try {
+      const response = await axios.get(`${this.apiUrl}/api/v1/apikeys`, {
+        params: {
+          account_index: accountIndex,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Get api keys infos failed:", error);
       return null;
     }
   }

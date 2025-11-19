@@ -19,10 +19,10 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.2.tgz#6f26dbc8fbc7205873ce3cee2f690eba0d421b39"
   integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
 
-"@oraichain/lighter-ts-sdk@^1.0.5":
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/@oraichain/lighter-ts-sdk/-/lighter-ts-sdk-1.0.5.tgz#41a9fdbcedbea1593bdaca18813043ee347b0d11"
-  integrity sha512-MKIJxWrYhaCjjtZmaeyFQsdhgALk+oEkhlWCSw4KniGq0OBbK5SdQL6fVW+aQPbsMILkemtelbyPYKdmK4qtTA==
+"@oraichain/lighter-ts-sdk@^1.0.6":
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@oraichain/lighter-ts-sdk/-/lighter-ts-sdk-1.0.6.tgz#664c228417d1da36bcce863d9d4f650882a45441"
+  integrity sha512-Ad8tsf/2i5EPNFLOOYyS4A58o+Rcr2r70kDMvxMFQBxpJoqDAWFWUADBwV7GE4YPTniO8bKBPMQ5WLO9ti44IQ==
   dependencies:
     axios "^1.6.0"
     dotenv "^16.4.5"
