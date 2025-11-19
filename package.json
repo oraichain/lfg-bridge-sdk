@@ -1,12 +1,14 @@
 {
   "name": "@oraichain/lfg-bridge-sdk",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "repository": "git@github.com:oraichain/lfg-bridge-sdk.git",
   "author": "ledanghuy1811 <huygamo567@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "prepublishOnly": "rm -rf dist && npm run build"
   },
   "dependencies": {
     "@oraichain/lighter-ts-sdk": "^1.0.6",
