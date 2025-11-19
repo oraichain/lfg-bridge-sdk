@@ -188,7 +188,7 @@ export class LighterBridge extends Bridge {
         finalApiPrivateKey = privateKey;
         // for simplicity, use the last api key index
         finalApiKeyIndex =
-          apiKeys?.api_keys[apiKeys.api_keys.length - 1].api_key_index;
+          apiKeys?.api_keys[apiKeys?.api_keys.length - 1]?.api_key_index;
         // this means this user is new and has no custom api key yet -> by default use finalApiKeyIndex = 2
         if (!finalApiKeyIndex || finalApiKeyIndex <= 1) {
           finalApiKeyIndex = 2;
@@ -210,7 +210,7 @@ export class LighterBridge extends Bridge {
           newPubkey: publicKey,
           newApiKeyIndex: finalApiKeyIndex,
         });
-        if (changeApiKeyResult[2] !== null) {
+        if (changeApiKeyResult[2]) {
           console.error("Change api key failed: ", changeApiKeyResult);
           throw new Error(
             `Change api key failed: ${changeApiKeyResult[2]}. Error code: ${changeApiKeyResult[0].code}`
