@@ -9,7 +9,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@oraichain/lighter-ts-sdk": "../lighter-ts-sdk",
+    "@oraichain/lighter-ts-sdk": "^1.0.6",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "ethers": "^6.15.0"
