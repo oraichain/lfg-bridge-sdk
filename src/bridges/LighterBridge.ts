@@ -135,7 +135,7 @@ export class LighterBridge extends Bridge {
           throw new Error("Get bridge infos failed");
         }
 
-        const bridgeInfo = bridgeInfos[bridgeInfos.length - 1];
+        const bridgeInfo = bridgeInfos[0];
         if (bridgeInfo.status === "completed") {
           return {
             status: "completed",
