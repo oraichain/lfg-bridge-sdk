@@ -21,6 +21,8 @@ export abstract class Bridge {
   protected usdcContract: ethers.Contract;
   // signer wallet
   protected signer: ethers.Wallet;
+  // api client
+  protected rpcUrl: string;
 
   constructor(rpcUrl: string, privateKey: string) {
     // init ethers provider
@@ -28,6 +30,9 @@ export abstract class Bridge {
 
     // init signer wallet
     this.signer = new ethers.Wallet(privateKey, this.provider);
+
+    // init rpc url
+    this.rpcUrl = rpcUrl;
   }
 
   // deposit USDC from Arbitrum to Dex chain

@@ -45,3 +45,17 @@ export interface CheckingWithdrawProgressResult {
   nonce: number;
   message: string;
 }
+
+export interface FastWithdrawParams {
+  fromAccountIndex: number;
+  apiKeyIndex: number;
+  toAccountIndex: number;
+  usdcAmount: number; // Amount in micro-USDC (6 decimals)
+  fee: number; // Fee in micro-USDC (6 decimals)
+  toAddress: string; // Ethereum address (will be converted to memo)
+  expiredAt: number; // Unix timestamp in milliseconds
+  nonce: number;
+  sig: string; // Base64 encoded signature
+  l1Sig: string; // Ethereum signature (hex string with 0x prefix)
+  authorization: string; // Authorization token
+}
