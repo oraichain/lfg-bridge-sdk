@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 import axios from "axios";
-import { AccountApi, ApiClient, SignerClient } from "@oraichain/lighter-ts-sdk";
+import { SignerClient } from "@oraichain/lighter-ts-sdk";
 
 import { LIGHTER_CONFIG } from "../configs";
 import {
@@ -157,10 +157,13 @@ export class LighterBridge extends Bridge {
   }: {
     apiPrivateKey?: string;
     apiKeyIndex?: number;
-  }): Promise<void> {
+  }): Promise<{ apiPrivateKey: string; apiKeyIndex: number } | null> {
     try {
       if (this.isInitSignerClient) {
-        return;
+        return {
+          apiPrivateKey: apiPrivateKey || "",
+          apiKeyIndex: apiKeyIndex || 0,
+        };
       }
 
       const l1Account = await this.getLighterAccounts(this.signer.address);
@@ -211,10 +214,7 @@ export class LighterBridge extends Bridge {
           newApiKeyIndex: finalApiKeyIndex,
         });
         if (changeApiKeyResult[2]) {
-          console.error("Change api key failed: ", changeApiKeyResult);
-          throw new Error(
-            `Change api key failed: ${changeApiKeyResult[2]}. Error code: ${changeApiKeyResult[0].code}`
-          );
+          throw new Error(`Change api key failed: ${changeApiKeyResult[2]}`);
         }
       }
 
@@ -230,6 +230,10 @@ export class LighterBridge extends Bridge {
       await this.signerClient.ensureWasmClient();
 
       this.isInitSignerClient = true;
+      return {
+        apiPrivateKey: finalApiPrivateKey || "",
+        apiKeyIndex: finalApiKeyIndex || 0,
+      };
     } catch (error) {
       console.error("Init signer client failed:", error);
 
@@ -365,6 +369,40 @@ export class LighterBridge extends Bridge {
       return response.data.bridges;
     } catch (error) {
       return null;
+    }
+  }
+
+  public async fastWithdraw(
+    params: LighterWithdrawParams
+  ): Promise<LighterWithdrawResult> {
+    try {
+      // make sure signer client is initialized
+      if (!this.isInitSignerClient) {
+        throw new Error("Signer client is not initialized");
+      }
+
+      // Create withdraw transaction
+      const [tx, txHash, error] = await this.signerClient.fastWithdraw(
+        {
+          usdcAmount: parseFloat(params.amount.toString()),
+          nonce: params.nonce || -1,
+        },
+        this.privateKey,
+        this.signer.address
+      );
+      if (error) {
+        throw new Error(`Create withdraw transaction failed: ${error}`);
+      }
+
+      return {
+        txHash: txHash,
+        amount: params.amount.toString(),
+        txInfo: tx,
+      };
+    } catch (error) {
+      console.error("Withdraw failed:", error);
+
+      throw error;
     }
   }
 }
