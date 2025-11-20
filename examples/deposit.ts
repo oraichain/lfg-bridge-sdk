@@ -13,10 +13,10 @@ const deposit = async () => {
 
   console.log("Deposit result:", result);
 
-  const depositProgress = await lighterBridge.checkingDepositProgress({
-    address: lighterBridge.signerAddress,
-  });
-  console.log("Deposit progress:", depositProgress);
+  // const depositProgress = await lighterBridge.checkingDepositProgress({
+  //   address: lighterBridge.signerAddress,
+  // });
+  // console.log("Deposit progress:", depositProgress);
 };
 
 deposit();
