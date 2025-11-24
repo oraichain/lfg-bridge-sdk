@@ -6,6 +6,9 @@ import {
   CheckingWithdrawProgressResult,
   DepositParams,
   DepositResult,
+  SendInternalResult,
+  SendParams,
+  SendResult,
   WithdrawParams,
   WithdrawResult,
 } from "./bridge";
@@ -37,6 +40,12 @@ export interface LighterCheckingWithdrawProgressParams
 
 export interface LighterCheckingWithdrawProgressResult
   extends CheckingWithdrawProgressResult {}
+
+export interface LighterSendInternalResult extends SendInternalResult {}
+
+export interface LighterSendParams extends SendParams {}
+
+export interface LighterSendResult extends SendResult {}
 
 export interface LighterSubAccount {
   code: number;

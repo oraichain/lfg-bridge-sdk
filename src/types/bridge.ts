@@ -59,3 +59,17 @@ export interface FastWithdrawParams {
   l1Sig: string; // Ethereum signature (hex string with 0x prefix)
   authorization: string; // Authorization token
 }
+
+export interface SendInternalResult {
+  txHash: string;
+  amount: string;
+  blockHeight?: number;
+  gasUsed?: string;
+}
+
+export interface SendParams {
+  toAddress: string;
+  amount: number;
+}
+
+export interface SendResult extends SendInternalResult {}
