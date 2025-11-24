@@ -8,6 +8,8 @@ import {
   CheckingWithdrawProgressResult,
   DepositParams,
   DepositResult,
+  SendParams,
+  SendResult,
   WithdrawParams,
   WithdrawResult,
 } from "../types";
@@ -34,6 +36,9 @@ export abstract class Bridge {
     // init rpc url
     this.rpcUrl = rpcUrl;
   }
+
+  // send USDC for Arbitrum
+  public abstract send(params: SendParams): Promise<SendResult>;
 
   // deposit USDC from Arbitrum to Dex chain
   public abstract deposit(params: DepositParams): Promise<DepositResult>;

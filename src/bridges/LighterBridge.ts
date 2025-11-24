@@ -14,6 +14,9 @@ import {
   LighterCheckingWithdrawProgressResult,
   LighterDepositParams,
   LighterDepositResult,
+  LighterSendInternalResult,
+  LighterSendParams,
+  LighterSendResult,
   LighterWithdrawParams,
   LighterWithdrawResult,
 } from "../types";
@@ -51,6 +54,18 @@ export class LighterBridge extends Bridge {
     );
   }
 
+  public async send(params: LighterSendParams): Promise<LighterSendResult> {
+    try {
+      const result = await this.sendInternal(params.toAddress, params.amount);
+
+      return result;
+    } catch (error) {
+      console.error("Send failed:", error);
+
+      throw error;
+    }
+  }
+
   public async deposit(
     params: LighterDepositParams
   ): Promise<LighterDepositResult> {
@@ -71,51 +86,18 @@ export class LighterBridge extends Bridge {
 
         params.intentAddress = intentAddress;
       }
-
       if (!params.intentAddress) {
         throw new Error("Intent address is not set");
       }
 
-      // connect contracts to wallet
-      const usdcContractWithSigner = this.usdcContract.connect(this.signer);
-
-      // Get USDC decimals
-      const decimals = await (usdcContractWithSigner as any).decimals();
-      // Convert amount to proper units
-      const amountInUnits = ethers.parseUnits(
-        params.amount.toString(),
-        decimals
-      );
-
-      // Check USDC balance
-      const balance = await (usdcContractWithSigner as any).balanceOf(
-        this.signer.address
-      );
-      if (balance < amountInUnits) {
-        throw new Error(
-          `Insufficient USDC balance. Required: ${ethers.formatUnits(
-            amountInUnits,
-            decimals
-          )}, Available: ${ethers.formatUnits(balance, decimals)}`
-        );
-      }
-
-      // send USDC to intent address
-      const tx = await (usdcContractWithSigner as any).transfer(
+      const result = await this.sendInternal(
         params.intentAddress,
-        amountInUnits
+        params.amount
       );
-      const receipt = await tx.wait();
-      if (!receipt) {
-        throw new Error("Transaction receipt not found");
-      }
 
       return {
-        txHash: tx.hash,
-        amount: params.amount.toString(),
+        ...result,
         status: "completed",
-        blockHeight: receipt.blockNumber,
-        gasUsed: receipt.gasUsed.toString(),
       };
     } catch (error) {
       console.error("Deposit failed:", error);
@@ -290,6 +272,55 @@ export class LighterBridge extends Bridge {
       };
     } catch (error) {
       console.error("Checking withdraw progress failed:", error);
+
+      throw error;
+    }
+  }
+
+  private async sendInternal(
+    toAddress: string,
+    amount: number
+  ): Promise<LighterSendInternalResult> {
+    try {
+      // connect contracts to wallet
+      const usdcContractWithSigner = this.usdcContract.connect(this.signer);
+
+      // Get USDC decimals
+      const decimals = await (usdcContractWithSigner as any).decimals();
+      // Convert amount to proper units
+      const amountInUnits = ethers.parseUnits(amount.toString(), decimals);
+
+      // Check USDC balance
+      const balance = await (usdcContractWithSigner as any).balanceOf(
+        this.signer.address
+      );
+      if (balance < amountInUnits) {
+        throw new Error(
+          `Insufficient USDC balance. Required: ${ethers.formatUnits(
+            amountInUnits,
+            decimals
+          )}, Available: ${ethers.formatUnits(balance, decimals)}`
+        );
+      }
+
+      // send USDC to intent address
+      const tx = await (usdcContractWithSigner as any).transfer(
+        toAddress,
+        amountInUnits
+      );
+      const receipt = await tx.wait();
+      if (!receipt) {
+        throw new Error("Transaction receipt not found");
+      }
+
+      return {
+        txHash: tx.hash,
+        amount: amount.toString(),
+        blockHeight: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString(),
+      };
+    } catch (error) {
+      console.error("Send internal failed:", error);
 
       throw error;
     }
