@@ -6,6 +6,7 @@ export interface BridgeConfig {
 
 export interface DepositParams {
   amount: number;
+  receiver?: string;
   gasPrice?: string;
   gasLimit?: string;
 }
@@ -20,6 +21,7 @@ export interface DepositResult {
 
 export interface WithdrawParams {
   amount: number;
+  receiver?: string;
 }
 
 export interface WithdrawResult {

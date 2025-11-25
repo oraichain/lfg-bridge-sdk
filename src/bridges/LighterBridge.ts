@@ -75,25 +75,16 @@ export class LighterBridge extends Bridge {
         throw new Error("Minimum deposit is 5 USDC");
       }
 
-      // check if account is exist
-      const account = await this.getLighterAccounts(this.signer.address);
-      if (!account || !params.intentAddress) {
-        // create lighter intent address
-        const intentAddress = await this.createLighterIntentAddress();
-        if (!intentAddress) {
-          throw new Error("Create lighter intent address failed");
-        }
-
-        params.intentAddress = intentAddress;
-      }
-      if (!params.intentAddress) {
-        throw new Error("Intent address is not set");
-      }
-
-      const result = await this.sendInternal(
-        params.intentAddress,
-        params.amount
+      // get intent address for receiver or signer
+      const intentAddress = await this.createLighterIntentAddress(
+        params.receiver || this.signer.address
       );
+      if (!intentAddress) {
+        throw new Error("Create lighter intent address failed");
+      }
+
+      // send usdc to intent address
+      const result = await this.sendInternal(intentAddress, params.amount);
 
       return {
         ...result,
@@ -361,11 +352,13 @@ export class LighterBridge extends Bridge {
     }
   }
 
-  private async createLighterIntentAddress(): Promise<string | null> {
+  private async createLighterIntentAddress(
+    address: string
+  ): Promise<string | null> {
     try {
       const params = new URLSearchParams();
       params.append("chain_id", this.config.chainId);
-      params.append("from_addr", this.signer.address);
+      params.append("from_addr", address);
       params.append("amount", "5000000");
       params.append("is_external_deposit", "false");
 
@@ -419,10 +412,10 @@ export class LighterBridge extends Bridge {
           nonce: params.nonce || -1,
         },
         this.privateKey,
-        this.signer.address
+        params.receiver || this.signer.address
       );
       if (error) {
-        throw new Error(`Create withdraw transaction failed: ${error}`);
+        throw new Error(`Create fast withdraw transaction failed: ${error}`);
       }
 
       return {
@@ -431,7 +424,7 @@ export class LighterBridge extends Bridge {
         txInfo: tx,
       };
     } catch (error) {
-      console.error("Withdraw failed:", error);
+      console.error("Fast withdraw failed:", error);
 
       throw error;
     }
