@@ -15,9 +15,7 @@ import {
 
 export interface LighterConfig extends BridgeConfig {}
 
-export interface LighterDepositParams extends DepositParams {
-  intentAddress?: string;
-}
+export interface LighterDepositParams extends DepositParams {}
 
 export interface LighterDepositResult extends DepositResult {}
 
