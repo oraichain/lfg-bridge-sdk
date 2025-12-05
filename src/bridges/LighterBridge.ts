@@ -128,13 +128,13 @@ export class LighterBridge extends Bridge {
     apiPrivateKey,
     apiKeyIndex,
   }: {
-    apiPrivateKey?: string;
+    apiPrivateKey?: `0x${string}`;
     apiKeyIndex?: number;
-  }): Promise<{ apiPrivateKey: string; apiKeyIndex: number } | null> {
+  }): Promise<{ apiPrivateKey: `0x${string}`; apiKeyIndex: number } | null> {
     try {
       if (this.isInitSignerClient) {
         return {
-          apiPrivateKey: apiPrivateKey || "",
+          apiPrivateKey: apiPrivateKey || "0x",
           apiKeyIndex: apiKeyIndex || 0,
         };
       }
@@ -161,7 +161,7 @@ export class LighterBridge extends Bridge {
         const { privateKey, publicKey } =
           await this.signerClient.generateAPIKey();
 
-        finalApiPrivateKey = privateKey;
+        finalApiPrivateKey = privateKey as `0x${string}`;
         // for simplicity, use the last api key index
         finalApiKeyIndex =
           apiKeys?.api_keys[apiKeys?.api_keys.length - 1]?.api_key_index;
@@ -204,7 +204,7 @@ export class LighterBridge extends Bridge {
 
       this.isInitSignerClient = true;
       return {
-        apiPrivateKey: finalApiPrivateKey || "",
+        apiPrivateKey: finalApiPrivateKey || "0x",
         apiKeyIndex: finalApiKeyIndex || 0,
       };
     } catch (error) {

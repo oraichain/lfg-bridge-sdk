@@ -3,7 +3,7 @@ import "dotenv/config";
 import { LighterBridge } from "../src";
 
 const withdraw = async () => {
-  const apiPrivateKey = process.env.API_PRIVATE_KEY || "";
+  const apiPrivateKey = (process.env.API_PRIVATE_KEY as `0x${string}`) || "0x";
   const privateKey = process.env.PRIVATE_KEY || "";
   const rpcUrl = process.env.RPC_URL || "";
 
