@@ -1,6 +1,6 @@
 {
   "name": "@oraichain/lfg-bridge-sdk",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "git@github.com:oraichain/lfg-bridge-sdk.git",
@@ -11,7 +11,7 @@
     "prepublishOnly": "rm -rf dist && npm run build"
   },
   "dependencies": {
-    "@oraichain/lighter-ts-sdk": "^1.0.16",
+    "@oraichain/lighter-ts-sdk": "^1.1.0",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "ethers": "^6.15.0"
