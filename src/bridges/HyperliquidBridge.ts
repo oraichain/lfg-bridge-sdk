@@ -1,4 +1,5 @@
 import { ethers } from "ethers";
+import { ExchangeClient, HttpTransport } from "@nktkas/hyperliquid";
 
 import { HYPERLIQUID_CONFIG } from "../configs/hyperliquid";
 import {
@@ -6,18 +7,20 @@ import {
   CheckingDepositProgressResult,
   CheckingWithdrawProgressParams,
   CheckingWithdrawProgressResult,
-  WithdrawParams,
-  WithdrawResult,
   HyperliquidConfig,
   HyperliquidDepositParams,
   HyperliquidDepositResult,
   HyperliquidSendInternalResult,
   HyperliquidSendParams,
   HyperliquidSendResult,
+  HyperliquidWithdrawParams,
+  HyperliquidWithdrawResult,
 } from "../types";
 import { Bridge } from "./Bridge";
 
 export class HyperliquidBridge extends Bridge {
+  private client: ExchangeClient;
+
   constructor(rpcUrl: string, privateKey: string) {
     super(rpcUrl, privateKey);
 
@@ -35,6 +38,12 @@ export class HyperliquidBridge extends Bridge {
       HYPERLIQUID_CONFIG.usdcAbi,
       this.provider
     );
+
+    // init exchange client
+    this.client = new ExchangeClient({
+      transport: new HttpTransport(),
+      wallet: this.signer,
+    });
   }
 
   public async send(
@@ -83,8 +92,35 @@ export class HyperliquidBridge extends Bridge {
     return;
   }
 
-  public async withdraw(params: WithdrawParams): Promise<WithdrawResult> {
-    return;
+  public async withdraw(
+    params: HyperliquidWithdrawParams
+  ): Promise<HyperliquidWithdrawResult> {
+    try {
+      // check if receiver is undefined
+      if (params.receiver === undefined) {
+        params.receiver = this.signer.address;
+      }
+
+      // check if amount is greater than 1
+      if (params.amount < 1) {
+        throw new Error("Minimum withdraw is 1 USDC");
+      }
+
+      // create withdraw transaction
+      await this.client.withdraw3({
+        amount: params.amount,
+        destination: params.receiver,
+      });
+
+      return {
+        amount: params.amount.toString(),
+        txHash: "",
+      };
+    } catch (error) {
+      console.error("Withdraw failed:", error);
+
+      throw error;
+    }
   }
 
   public async checkingWithdrawProgress(
