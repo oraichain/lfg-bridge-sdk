@@ -11,7 +11,8 @@
     "prepublishOnly": "rm -rf dist && npm run build"
   },
   "dependencies": {
-    "@oraichain/lighter-ts-sdk": "^1.1.0",
+    "@nktkas/hyperliquid": "^0.30.0",
+    "@oraichain/lighter-ts-sdk": "^1.1.3",
     "axios": "^1.13.2",
     "dotenv": "^17.2.3",
     "ethers": "^6.15.0"
