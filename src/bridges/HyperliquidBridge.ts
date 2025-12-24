@@ -1,3 +1,6 @@
+import { ethers } from "ethers";
+
+import { HYPERLIQUID_CONFIG } from "../configs/hyperliquid";
 import {
   CheckingDepositProgressParams,
   CheckingDepositProgressResult,
@@ -5,20 +8,47 @@ import {
   CheckingWithdrawProgressResult,
   DepositParams,
   DepositResult,
-  SendParams,
-  SendResult,
   WithdrawParams,
   WithdrawResult,
 } from "../types";
 import { Bridge } from "./Bridge";
+import {
+  HyperliquidSendInternalResult,
+  HyperliquidSendParams,
+  HyperliquidSendResult,
+} from "../types/hyperliquid";
 
 export class HyperliquidBridge extends Bridge {
   constructor(rpcUrl: string, privateKey: string) {
     super(rpcUrl, privateKey);
+
+    // init hyperliquid config
+    this.config = {
+      usdcContract: HYPERLIQUID_CONFIG.usdcContract,
+      chainId: HYPERLIQUID_CONFIG.chainId,
+      rpcUrl,
+    };
+
+    // init usdc contract
+    this.usdcContract = new ethers.Contract(
+      this.config.usdcContract,
+      HYPERLIQUID_CONFIG.usdcAbi,
+      this.provider
+    );
   }
 
-  public async send(params: SendParams): Promise<SendResult> {
-    return;
+  public async send(
+    params: HyperliquidSendParams
+  ): Promise<HyperliquidSendResult> {
+    try {
+      const result = await this.sendInternal(params.toAddress, params.amount);
+
+      return result;
+    } catch (error) {
+      console.error("Send failed:", error);
+
+      throw error;
+    }
   }
 
   public async deposit(params: DepositParams): Promise<DepositResult> {
@@ -39,5 +69,54 @@ export class HyperliquidBridge extends Bridge {
     params: CheckingWithdrawProgressParams
   ): Promise<CheckingWithdrawProgressResult> {
     return;
+  }
+
+  private async sendInternal(
+    toAddress: string,
+    amount: number
+  ): Promise<HyperliquidSendInternalResult> {
+    try {
+      // connect contracts to wallet
+      const usdcContractWithSigner = this.usdcContract.connect(this.signer);
+
+      // Get USDC decimals
+      const decimals = await (usdcContractWithSigner as any).decimals();
+      // Convert amount to proper units
+      const amountInUnits = ethers.parseUnits(amount.toString(), decimals);
+
+      // Check USDC balance
+      const balance = await (usdcContractWithSigner as any).balanceOf(
+        this.signer.address
+      );
+      if (balance < amountInUnits) {
+        throw new Error(
+          `Insufficient USDC balance. Required: ${ethers.formatUnits(
+            amountInUnits,
+            decimals
+          )}, Available: ${ethers.formatUnits(balance, decimals)}`
+        );
+      }
+
+      // send USDC to intent address
+      const tx = await (usdcContractWithSigner as any).transfer(
+        toAddress,
+        amountInUnits
+      );
+      const receipt = await tx.wait();
+      if (!receipt) {
+        throw new Error("Transaction receipt not found");
+      }
+
+      return {
+        txHash: tx.hash,
+        amount: amount.toString(),
+        blockHeight: receipt.blockNumber,
+        gasUsed: receipt.gasUsed.toString(),
+      };
+    } catch (error) {
+      console.error("Send internal failed:", error);
+
+      throw error;
+    }
   }
 }
