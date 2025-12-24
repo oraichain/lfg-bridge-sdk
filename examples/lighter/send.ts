@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { LighterBridge } from "../dist";
+import { LighterBridge } from "../../dist";
 
 const send = async () => {
   const privateKey = process.env.PRIVATE_KEY || "";

@@ -7,6 +7,21 @@
   resolved "https://registry.yarnpkg.com/@adraffy/ens-normalize/-/ens-normalize-1.10.1.tgz#63430d04bd8c5e74f8d7d049338f1cd9d4f02069"
   integrity sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==
 
+"@nktkas/hyperliquid@^0.30.0":
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/@nktkas/hyperliquid/-/hyperliquid-0.30.0.tgz#6d27fb5705cf99a548303c134084ad54bdfb9a18"
+  integrity sha512-nFHtcOsIcF1wk78y7tu/3a2q+UdGhYxebxPE/SpJqbpfEj/FtrNYRY/+FvfqDbf8FDOdC8DorQhdmIq6inmZCA==
+  dependencies:
+    "@nktkas/rews" "^1.2.2"
+    "@noble/hashes" "^2.0.1"
+    micro-eth-signer "^0.18.1"
+    valibot "1.2.0"
+
+"@nktkas/rews@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@nktkas/rews/-/rews-1.2.2.tgz#df3a4ee36c1ae8761f3a9ba1decb6f9fb1a65257"
+  integrity sha512-gO6igHgXEep4PApu7jKDlk232fWoBBmheQ4K3BkcZd+QsQ6PTo7F56jnz3kQxLWnHWHpXVh1vHO/VM6vTrorYg==
+
 "@noble/curves@1.2.0":
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-1.2.0.tgz#92d7e12e4e49b23105a2555c6984d41733d65c35"
@@ -14,19 +29,36 @@
   dependencies:
     "@noble/hashes" "1.3.2"
 
+"@noble/curves@^2.0.0":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-2.0.1.tgz#64ba8bd5e8564a02942655602515646df1cdb3ad"
+  integrity sha512-vs1Az2OOTBiP4q0pwjW5aF0xp9n4MxVrmkFBxc6EKZc6ddYx5gaZiAsZoq0uRRXWbi3AT/sBqn05eRPtn1JCPw==
+  dependencies:
+    "@noble/hashes" "2.0.1"
+
 "@noble/hashes@1.3.2":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.2.tgz#6f26dbc8fbc7205873ce3cee2f690eba0d421b39"
   integrity sha512-MVC8EAQp7MvEcm30KWENFjgR+Mkmf+D189XJTkFIlwohU5hcBbn1ZkKq7KVTi2Hme3PMGF390DaL52beVrIihQ==
 
-"@oraichain/lighter-ts-sdk@^1.1.0":
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/@oraichain/lighter-ts-sdk/-/lighter-ts-sdk-1.1.0.tgz#ad0d756b7713bee6077cabfe1aa51584a8238c6c"
-  integrity sha512-4cRWJFYrBRdQmxkGer8M1M1Ti19J0g9EGRxGq+JUvq2jFjigO93hW0bzJtZpX92aEkFRvETMC7m1NSAFn9+4Mw==
+"@noble/hashes@2.0.1", "@noble/hashes@^2.0.0", "@noble/hashes@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-2.0.1.tgz#fc1a928061d1232b0a52bb754393c37a5216c89e"
+  integrity sha512-XlOlEbQcE9fmuXxrVTXCTlG2nlRXa9Rj3rr5Ue/+tX+nmkgbX720YHh0VR3hBF9xDvwnb8D2shVGOwNx+ulArw==
+
+"@oraichain/lighter-ts-sdk@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@oraichain/lighter-ts-sdk/-/lighter-ts-sdk-1.1.3.tgz#6fe3557701689bf7337a862eac749bdb2dbca9a5"
+  integrity sha512-8b4ocSy6uMTvI1+ji7Z+Gan+esWaH8loY6WcKifMAYFIS+ika9aVy0dt3vm48uHbPI1K9Jncd4OSyzB91HDr6g==
   dependencies:
     axios "^1.6.0"
     dotenv "^16.4.5"
     ethers "^6.8.0"
+
+"@scure/base@2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-2.0.0.tgz#ba6371fddf92c2727e88ad6ab485db6e624f9a98"
+  integrity sha512-3E1kpuZginKkek01ovG8krQ0Z44E3DHPjc5S2rjJw9lZn3KSQOs8S7wqikF/AH7iRanHypj85uGyxk0XAyC37w==
 
 "@types/node@22.7.5":
   version "22.7.5"
@@ -207,6 +239,22 @@ math-intrinsics@^1.1.0:
   resolved "https://registry.yarnpkg.com/math-intrinsics/-/math-intrinsics-1.1.0.tgz#a0dd74be81e2aa5c2f27e65ce283605ee4e2b7f9"
   integrity sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==
 
+micro-eth-signer@^0.18.1:
+  version "0.18.1"
+  resolved "https://registry.yarnpkg.com/micro-eth-signer/-/micro-eth-signer-0.18.1.tgz#3a37e5ddff6a13c1bffe6eddb8774e8242cea2ee"
+  integrity sha512-vXKhCZxrytpl+dXR9JeaE41ZVFndi7wCKc1Jd22smOMAeDErvRcXaTxhYUf1yQxis4n2kIdv/pH7iuf+5/cj+Q==
+  dependencies:
+    "@noble/curves" "^2.0.0"
+    "@noble/hashes" "^2.0.0"
+    micro-packed "^0.8.0"
+
+micro-packed@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/micro-packed/-/micro-packed-0.8.0.tgz#fe516c50b7150fd84728b8456731f79e2925eaf8"
+  integrity sha512-AKb8znIvg9sooythbXzyFeChEY0SkW0C6iXECpy/ls0e5BtwXO45J9wD9SLzBztnS4XmF/5kwZknsq+jyynd/A==
+  dependencies:
+    "@scure/base" "2.0.0"
+
 mime-db@1.52.0:
   version "1.52.0"
   resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.52.0.tgz#bbabcdc02859f4987301c856e3387ce5ec43bf70"
@@ -238,6 +286,11 @@ undici-types@~6.19.2:
   version "6.19.8"
   resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
   integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
+
+valibot@1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/valibot/-/valibot-1.2.0.tgz#8fc720d9e4082ba16e30a914064a39619b2f1d6f"
+  integrity sha512-mm1rxUsmOxzrwnX5arGS+U4T25RdvpPjPN4yR0u9pUBov9+zGVtO84tif1eY4r6zWxVxu3KzIyknJy3rxfRZZg==
 
 ws@8.17.1:
   version "8.17.1"
