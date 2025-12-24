@@ -6,17 +6,16 @@ import {
   CheckingDepositProgressResult,
   CheckingWithdrawProgressParams,
   CheckingWithdrawProgressResult,
-  DepositParams,
-  DepositResult,
   WithdrawParams,
   WithdrawResult,
-} from "../types";
-import { Bridge } from "./Bridge";
-import {
+  HyperliquidConfig,
+  HyperliquidDepositParams,
+  HyperliquidDepositResult,
   HyperliquidSendInternalResult,
   HyperliquidSendParams,
   HyperliquidSendResult,
-} from "../types/hyperliquid";
+} from "../types";
+import { Bridge } from "./Bridge";
 
 export class HyperliquidBridge extends Bridge {
   constructor(rpcUrl: string, privateKey: string) {
@@ -27,7 +26,8 @@ export class HyperliquidBridge extends Bridge {
       usdcContract: HYPERLIQUID_CONFIG.usdcContract,
       chainId: HYPERLIQUID_CONFIG.chainId,
       rpcUrl,
-    };
+      bridgeContract: HYPERLIQUID_CONFIG.bridgeContract,
+    } as HyperliquidConfig;
 
     // init usdc contract
     this.usdcContract = new ethers.Contract(
@@ -51,8 +51,30 @@ export class HyperliquidBridge extends Bridge {
     }
   }
 
-  public async deposit(params: DepositParams): Promise<DepositResult> {
-    return;
+  public async deposit(
+    params: HyperliquidDepositParams
+  ): Promise<HyperliquidDepositResult> {
+    try {
+      // check min-deposit is 5 USDC
+      if (params.amount < 5) {
+        throw new Error("Minimum deposit is 5 USDC");
+      }
+
+      // send usdc to bridge contract
+      const result = await this.sendInternal(
+        (this.config as HyperliquidConfig).bridgeContract,
+        params.amount
+      );
+
+      return {
+        ...result,
+        status: "completed",
+      };
+    } catch (error) {
+      console.error("Deposit failed:", error);
+
+      throw error;
+    }
   }
 
   public async checkingDepositProgress(

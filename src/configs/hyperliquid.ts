@@ -6,4 +6,5 @@ export const HYPERLIQUID_CONFIG = {
     "function decimals() external view returns (uint8)",
     "function balanceOf(address account) external view returns (uint256)",
   ],
+  bridgeContract: "0x2Df1c51E09aECF9cacB7bc98cB1742757f163dF7",
 };
