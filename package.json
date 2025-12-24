@@ -1,6 +1,6 @@
 {
   "name": "@oraichain/lfg-bridge-sdk",
-  "version": "1.0.6",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": "git@github.com:oraichain/lfg-bridge-sdk.git",
